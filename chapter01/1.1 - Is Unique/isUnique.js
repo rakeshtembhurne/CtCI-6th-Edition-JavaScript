@@ -1,29 +1,27 @@
-var allUniqueChars = function(string) {
-  
-  // O(n^2) approach, no additional data structures used
-  // for each character, check remaining characters for duplicates
-  for (var i = 0; i < string.length; i++) {
-    for (var j = i + 1; j < string.length; j++) {
+const { repeatedTest, curry } = require("../../lib/test");
+
+function isUniqueByBruteForce(string) {
+  for (let i = 0; i < string.length; i++) {
+    for (let j = i + 1; j < string.length; j++) {
       if (string[i] === string[j]) {
-        return false; // if match, return false
+        return false;
       }
     }
   }
-  return true; // if no match, return true
-};
+  return true;
+}
 
-const everyCharUnique = (str, indexOffset = 'a'.charCodeAt()) => {
-    let counterTable = Number();
-    for(let index of [...str].map(c => c.charCodeAt() - indexOffset)) {
-        const mask = 1 << index;
-        if(counterTable & mask)
-            return false;
-        counterTable |= mask;
-    }
-    return true;
-};
+function isUniqueByBitwiseOp(str, indexOffset = "a".charCodeAt()) {
+  let counterTable = Number();
+  for (let index of [...str].map((c) => c.charCodeAt() - indexOffset)) {
+    const mask = 1 << index;
+    if (counterTable & mask) return false;
+    counterTable |= mask;
+  }
+  return true;
+}
 
-function everyCharUnique(str) {
+function isUniqueByHashTable(str) {
   let obj = {};
   for (let i = 0; i < str.length; i++) {
     if (obj[str[i]] && obj[str[i]] >= 1) {
@@ -35,8 +33,47 @@ function everyCharUnique(str) {
   return true;
 }
 
-/* TESTS */
-console.log(everyCharUnique('abcd'), 'true');
-console.log(everyCharUnique('abccd'), 'false');
-console.log(everyCharUnique('bhjjb'), 'false');
-console.log(everyCharUnique('mdjq'), 'true');
+function hasUniqueCharactersSet(str) {
+  let chars = new Set();
+
+  for (let i = 0; i < str.length; ++i) {
+    if (chars.has(str[i])) {
+      return false;
+    }
+    chars.add(str[i]);
+  }
+  return true;
+}
+
+function hasUniqueCharactersSort(str) {
+  // sort string using quicksort
+  const strArray = str.split("");
+  strArray.sort();
+
+  for (var i = 1; i < strArray.length; ++i) {
+    if (strArray[i] === strArray[i - 1]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+const testCases = [
+  { input: ["abcd"], output: true },
+  { input: ["abccd"], output: false },
+  { input: ["bhjjb"], output: false },
+  { input: ["mdjq"], output: true },
+  { input: ["someblablablablalargetesttocheck"], output: false },
+];
+
+repeatedTest("isUniqueByBruteForce", isUniqueByBruteForce, testCases);
+repeatedTest("isUniqueByBitwiseOp", isUniqueByBitwiseOp, testCases);
+repeatedTest("isUniqueByHashTable", isUniqueByHashTable, testCases);
+repeatedTest("hasUniqueCharactersSet", hasUniqueCharactersSet, testCases);
+const results = repeatedTest(
+  "hasUniqueCharactersSort",
+  hasUniqueCharactersSort,
+  testCases
+);
+
+console.table(results);
